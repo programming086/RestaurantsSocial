@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Social
 
 class RestaurantTableViewController: UITableViewController {
     var restaurantNames = ["Cafe Deadend", "Homei", "Teakha", "Cafe Loisl", "Petite Oyster", "For Kee Restaurant", "Po's Atelier", "Bourke Street Bakery", "Haigh's Chocolate", "Palomino Espresso", "Upstate", "Traif", "Graham Avenue Meats", "Waffle & Wolf", "Five Leaves", "Cafe Lore", "Confessional", "Barrafina", "Donostia", "Royal Oak", "Thai Cafe"]
@@ -107,8 +108,38 @@ class RestaurantTableViewController: UITableViewController {
         let shareAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Share", handler: { (action:UITableViewRowAction, indexPath:NSIndexPath) -> Void in
 
             let shareMenu = UIAlertController(title: nil, message: "Share using", preferredStyle: .ActionSheet)
-            let twitterAction = UIAlertAction(title: "Twitter", style: UIAlertActionStyle.Default, handler: nil)
-            let facebookAction = UIAlertAction(title: "Facebook", style: UIAlertActionStyle.Default, handler: nil)
+            let twitterAction = UIAlertAction(title: "Twitter", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+                guard SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter) else {
+                    let alertMessage = UIAlertController(title: "Twitter Unavailable", message: "Login Error", preferredStyle: .Alert)
+                    alertMessage.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+                    self.presentViewController(alertMessage, animated: true, completion: nil)
+                    
+                    return
+                }
+                
+                let tweetComposer = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
+                tweetComposer.setInitialText(self.restaurantNames[indexPath.row])
+                tweetComposer.addImage(UIImage(named: self.restaurantImages[indexPath.row]))
+                self.presentViewController(tweetComposer, animated: true, completion: nil)
+            })
+            
+            let facebookAction = UIAlertAction(title: "Facebook", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
+                guard SLComposeViewController.isAvailableForServiceType(SLServiceTypeFacebook) else {
+                    let alertMessage = UIAlertController(title: "Facebook Unavailable", message: "Login Error", preferredStyle: .Alert)
+                    alertMessage.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+                    self.presentViewController(alertMessage, animated: true, completion: nil)
+                    
+                    return
+                }
+                
+                let facebookComposer = SLComposeViewController(forServiceType: SLServiceTypeFacebook)
+                facebookComposer.setInitialText(self.restaurantNames[indexPath.row])
+                facebookComposer.addImage(UIImage(named: self.restaurantImages[indexPath.row]))
+                facebookComposer.addURL(NSURL(string: "www.vk.com/JustDev")!)
+                self.presentViewController(facebookComposer, animated: true, completion: nil)
+            })
+            
+            
             let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
             
             shareMenu.addAction(twitterAction)
